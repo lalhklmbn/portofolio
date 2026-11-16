@@ -85,15 +85,25 @@
     });
   }
 
-  /* ---------- Role rotator (cross-fade) ---------- */
-  var roleWords = Array.prototype.slice.call(document.querySelectorAll(".role-rotator__word"));
-  if (roleWords.length > 1 && !prefersReducedMotion) {
-    var activeIndex = 0;
-    setInterval(function () {
-      roleWords[activeIndex].classList.remove("is-active");
-      activeIndex = (activeIndex + 1) % roleWords.length;
-      roleWords[activeIndex].classList.add("is-active");
-    }, 2600);
+  /* ---------- Role rotator (cross-fade, single element so it can never overflow) ---------- */
+  var roleRotator = document.querySelector(".role-rotator");
+  if (roleRotator) {
+    var roles = (roleRotator.getAttribute("data-roles") || "")
+      .split(",")
+      .map(function (s) { return s.trim(); })
+      .filter(Boolean);
+    var roleWordEl = roleRotator.querySelector(".role-rotator__word");
+    if (roles.length > 1 && roleWordEl && !prefersReducedMotion) {
+      var roleIndex = 0;
+      setInterval(function () {
+        roleWordEl.classList.add("is-fading");
+        setTimeout(function () {
+          roleIndex = (roleIndex + 1) % roles.length;
+          roleWordEl.textContent = roles[roleIndex];
+          roleWordEl.classList.remove("is-fading");
+        }, 220);
+      }, 2800);
+    }
   }
 
   /* ---------- Animated stat counters ---------- */
