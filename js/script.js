@@ -1,6 +1,6 @@
 /* ===========================================================
-   PORTOFOLIO — script.js
-   Semua interaksi murni frontend, tanpa dependensi eksternal.
+   PORTFOLIO — script.js
+   Pure frontend interactions, no external dependencies.
    =========================================================== */
 
 (function () {
@@ -8,11 +8,11 @@
 
   var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---------- Tahun otomatis di footer ---------- */
+  /* ---------- Footer year ---------- */
   var yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  /* ---------- Navbar: shadow saat scroll ---------- */
+  /* ---------- Navbar shadow on scroll ---------- */
   var navbar = document.getElementById("navbar");
   function updateNavbarState() {
     if (window.scrollY > 12) navbar.classList.add("is-scrolled");
@@ -21,7 +21,7 @@
   updateNavbarState();
   window.addEventListener("scroll", updateNavbarState, { passive: true });
 
-  /* ---------- Menu mobile ---------- */
+  /* ---------- Mobile menu ---------- */
   var navToggle = document.getElementById("navToggle");
   var navLinks = document.getElementById("navLinks");
   navToggle.addEventListener("click", function () {
@@ -37,21 +37,15 @@
     });
   });
 
-  /* ---------- Scrollspy: tandai link aktif ---------- */
-  var sections = Array.prototype.slice.call(
-    document.querySelectorAll("main section[id]")
-  );
+  /* ---------- Scrollspy ---------- */
+  var sections = Array.prototype.slice.call(document.querySelectorAll("main section[id]"));
   var navAnchors = Array.prototype.slice.call(document.querySelectorAll(".nav-link"));
-
   function updateActiveLink() {
     var scrollPos = window.scrollY + 140;
     var current = sections[0];
-    sections.forEach(function (sec) {
-      if (sec.offsetTop <= scrollPos) current = sec;
-    });
+    sections.forEach(function (sec) { if (sec.offsetTop <= scrollPos) current = sec; });
     navAnchors.forEach(function (link) {
-      var match = link.getAttribute("href") === "#" + current.id;
-      link.classList.toggle("is-active", match);
+      link.classList.toggle("is-active", link.getAttribute("href") === "#" + current.id);
     });
   }
   updateActiveLink();
@@ -62,45 +56,36 @@
   function updateProgress() {
     var doc = document.documentElement;
     var scrollable = doc.scrollHeight - doc.clientHeight;
-    var pct = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
-    progressBar.style.width = pct + "%";
+    progressBar.style.width = (scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0) + "%";
   }
   updateProgress();
   window.addEventListener("scroll", updateProgress, { passive: true });
   window.addEventListener("resize", updateProgress);
 
-  /* ---------- Reveal-on-scroll (IntersectionObserver) ---------- */
+  /* ---------- Reveal-on-scroll ---------- */
   var revealTargets = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
   var wordTargets = Array.prototype.slice.call(document.querySelectorAll(".reveal-word"));
 
   if (prefersReducedMotion || !("IntersectionObserver" in window)) {
-    revealTargets.concat(wordTargets).forEach(function (el) {
-      el.classList.add("is-visible");
-    });
+    revealTargets.concat(wordTargets).forEach(function (el) { el.classList.add("is-visible"); });
   } else {
-    var observer = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (!entry.isIntersecting) return;
-          var el = entry.target;
-          var delay = parseInt(el.getAttribute("data-reveal-delay") || "0", 10);
-          setTimeout(function () {
-            el.classList.add("is-visible");
-          }, delay);
-          observer.unobserve(el);
-        });
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
-    );
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var el = entry.target;
+        var delay = parseInt(el.getAttribute("data-reveal-delay") || "0", 10);
+        setTimeout(function () { el.classList.add("is-visible"); }, delay);
+        observer.unobserve(el);
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
     revealTargets.forEach(function (el) { observer.observe(el); });
 
-    // Hero title: animasi kata muncul berurutan saat halaman dimuat
     wordTargets.forEach(function (el, i) {
       setTimeout(function () { el.classList.add("is-visible"); }, 120 + i * 110);
     });
   }
 
-  /* ---------- Role rotator (cross-fade, bukan efek mengetik) ---------- */
+  /* ---------- Role rotator (cross-fade) ---------- */
   var roleWords = Array.prototype.slice.call(document.querySelectorAll(".role-rotator__word"));
   if (roleWords.length > 1 && !prefersReducedMotion) {
     var activeIndex = 0;
@@ -111,67 +96,121 @@
     }, 2600);
   }
 
-  /* ---------- Lightbox galeri foto ---------- */
-  var lightbox = document.getElementById("lightbox");
-  var lightboxImg = document.getElementById("lightboxImg");
-  var lightboxTriggers = Array.prototype.slice.call(document.querySelectorAll("[data-lightbox]"));
-  var lastFocusedEl = null;
-
-  function openLightbox(src, alt) {
-    lastFocusedEl = document.activeElement;
-    lightboxImg.src = src;
-    lightboxImg.alt = alt || "Pratinjau gambar";
-    lightbox.classList.add("is-open");
-    lightbox.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
-    lightbox.querySelector(".lightbox__close").focus();
+  /* ---------- Animated stat counters ---------- */
+  var statValues = Array.prototype.slice.call(document.querySelectorAll(".stat-value"));
+  function formatCount(value, decimals) {
+    return decimals ? value.toFixed(decimals) : Math.round(value).toLocaleString("en-US");
   }
-  function closeLightbox() {
-    lightbox.classList.remove("is-open");
-    lightbox.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
-    lightboxImg.src = "";
-    if (lastFocusedEl) lastFocusedEl.focus();
+  function animateCount(el) {
+    var target = parseFloat(el.getAttribute("data-count-to"));
+    var decimals = parseInt(el.getAttribute("data-decimals") || "0", 10);
+    var suffix = el.getAttribute("data-suffix") || "";
+    if (prefersReducedMotion || isNaN(target)) {
+      el.textContent = formatCount(target, decimals) + suffix;
+      return;
+    }
+    var duration = 1200;
+    var start = null;
+    function step(timestamp) {
+      if (!start) start = timestamp;
+      var progress = Math.min((timestamp - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = formatCount(target * eased, decimals) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  if (statValues.length) {
+    if ("IntersectionObserver" in window) {
+      var statObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            animateCount(entry.target);
+            statObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.4 });
+      statValues.forEach(function (el) { statObserver.observe(el); });
+    } else {
+      statValues.forEach(animateCount);
+    }
   }
 
-  lightboxTriggers.forEach(function (trigger) {
-    trigger.addEventListener("click", function () {
-      var img = trigger.querySelector("img");
-      // Jangan buka lightbox jika gambar asli belum ditambahkan (placeholder aktif)
-      if (!img || img.style.display === "none") return;
-      openLightbox(trigger.getAttribute("data-lightbox"), img.alt);
+  /* ---------- Timeline scroll-fill line ---------- */
+  var timeline = document.getElementById("timeline");
+  var timelineFill = document.getElementById("timelineFill");
+  function updateTimelineFill() {
+    if (!timeline || !timelineFill) return;
+    var rect = timeline.getBoundingClientRect();
+    var viewportCenter = window.innerHeight * 0.65;
+    var total = rect.height;
+    var covered = viewportCenter - rect.top;
+    var pct = Math.max(0, Math.min(100, (covered / total) * 100));
+    timelineFill.style.height = pct + "%";
+  }
+  updateTimelineFill();
+  window.addEventListener("scroll", updateTimelineFill, { passive: true });
+  window.addEventListener("resize", updateTimelineFill);
+
+  /* ---------- Case study tabs (GorryWell use cases) ---------- */
+  document.querySelectorAll(".tabs").forEach(function (tabGroup) {
+    var tabs = Array.prototype.slice.call(tabGroup.querySelectorAll('[role="tab"]'));
+    var panels = tabs.map(function (tab) { return document.getElementById(tab.getAttribute("aria-controls")); });
+
+    function activate(index) {
+      tabs.forEach(function (tab, i) {
+        var isActive = i === index;
+        tab.classList.toggle("is-active", isActive);
+        tab.setAttribute("aria-selected", String(isActive));
+        tab.tabIndex = isActive ? 0 : -1;
+        if (panels[i]) panels[i].hidden = !isActive;
+      });
+    }
+
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { activate(i); });
+      tab.addEventListener("keydown", function (e) {
+        var newIndex = null;
+        if (e.key === "ArrowRight") newIndex = (i + 1) % tabs.length;
+        else if (e.key === "ArrowLeft") newIndex = (i - 1 + tabs.length) % tabs.length;
+        else if (e.key === "Home") newIndex = 0;
+        else if (e.key === "End") newIndex = tabs.length - 1;
+        if (newIndex !== null) {
+          e.preventDefault();
+          activate(newIndex);
+          tabs[newIndex].focus();
+        }
+      });
     });
   });
-  lightbox.querySelectorAll("[data-close]").forEach(function (el) {
-    el.addEventListener("click", closeLightbox);
-  });
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && lightbox.classList.contains("is-open")) closeLightbox();
-  });
 
-  /* ---------- Tombol kembali ke atas ---------- */
-  var backToTop = document.getElementById("backToTop");
-  function updateBackToTop() {
-    backToTop.classList.toggle("is-visible", window.scrollY > 600);
+  /* ---------- Copy email to clipboard ---------- */
+  var copyBtn = document.getElementById("copyEmailBtn");
+  var copyText = document.getElementById("copyEmailText");
+  if (copyBtn && copyText) {
+    var originalText = copyText.textContent;
+    copyBtn.addEventListener("click", function () {
+      var email = originalText.trim();
+      function showCopied() {
+        copyText.textContent = "Copied to clipboard!";
+        setTimeout(function () { copyText.textContent = originalText; }, 1800);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(email).then(showCopied).catch(function () {
+          window.location.href = "mailto:" + email;
+        });
+      } else {
+        window.location.href = "mailto:" + email;
+      }
+    });
   }
+
+  /* ---------- Back to top ---------- */
+  var backToTop = document.getElementById("backToTop");
+  function updateBackToTop() { backToTop.classList.toggle("is-visible", window.scrollY > 600); }
   updateBackToTop();
   window.addEventListener("scroll", updateBackToTop, { passive: true });
   backToTop.addEventListener("click", function () {
     window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
-  });
-
-  /* ---------- Fallback pratinjau PDF jika berkas belum ada ----------
-     iframe tidak selalu memicu error saat berkas 404, jadi kita cek
-     status via fetch (HEAD) bila memungkinkan; jika gagal, fallback tetap tampil. */
-  document.querySelectorAll(".doc-card__preview iframe").forEach(function (frame) {
-    var src = frame.getAttribute("src");
-    if (!src) return;
-    fetch(src, { method: "HEAD" })
-      .then(function (res) {
-        if (!res.ok) frame.closest(".doc-card__preview").classList.add("no-file");
-      })
-      .catch(function () {
-        /* Dibuka langsung dari file:// atau offline — biarkan iframe mencoba memuat. */
-      });
   });
 })();

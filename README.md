@@ -1,10 +1,10 @@
-# Portofolio Pribadi
+# Bilal Hakkul Mubin — Portfolio
 
-Website portofolio statis — **murni HTML, CSS, dan JavaScript**, tanpa database
-dan tanpa backend. Semua konten (foto, PDF, teks) diedit langsung lewat file,
-lalu di-push ke GitHub.
+A static, text-first portfolio built on **pure HTML, CSS, and JavaScript** —
+no database, no backend, no build step. It's organized around real project
+management experience: a role timeline and detailed case studies.
 
-## Struktur Folder
+## Structure
 
 ```
 index.html
@@ -12,94 +12,66 @@ css/
   └─ style.css
 js/
   └─ script.js
-assets/
-  ├─ images/
-  │   ├─ profile/     → foto profil (4 tempat)
-  │   ├─ portrait/     → foto potret (3 tempat)
-  │   └─ landscape/    → foto lanskap (3 tempat)
-  └─ pdfs/             → dokumen PDF (3 tempat, dengan pratinjau langsung)
 ```
 
-## Cara Mengganti Foto
+There are no image or PDF folders — this site is intentionally content-only.
 
-Setiap foto punya **nama file tetap**. Yang perlu Anda lakukan hanyalah
-mengunggah foto Anda sendiri dengan nama file yang **persis sama**
-(format `.jpg`) ke folder yang sesuai lewat GitHub (upload file / drag-drop),
-menimpa placeholder yang ada. Tidak perlu edit kode sama sekali.
+## Editing Content
 
-| Lokasi di halaman | Path file yang harus diisi | Rasio disarankan |
-|---|---|---|
-| Avatar kecil di navbar | `assets/images/profile/profile-nav.jpg` | 1:1 (persegi) |
-| Foto besar di Hero | `assets/images/profile/profile-hero.jpg` | 3:4 (potret) |
-| Foto di bagian "Tentang" | `assets/images/profile/profile-about.jpg` | 4:5 (potret) |
-| Foto di Kontak/Footer | `assets/images/profile/profile-footer.jpg` | 1:1 (persegi) |
-| Galeri Potret #1–#3 | `assets/images/portrait/portrait-1.jpg`, `portrait-2.jpg`, `portrait-3.jpg` | 3:4 (potret) |
-| Galeri Lanskap #1–#3 | `assets/images/landscape/landscape-1.jpg`, `landscape-2.jpg`, `landscape-3.jpg` | 16:10 (landscape) |
+Everything lives in `index.html`. The sections, in order:
 
-> Selama belum ada file di path tersebut, halaman otomatis menampilkan kotak
-> placeholder bergaya putus-putus berwarna biru berisi nama file yang
-> dibutuhkan — jadi tampilan tetap rapi sebelum Anda menambahkan foto asli.
+| Section (`id`) | What it contains |
+|---|---|
+| `#hero` | Name, rotating role tagline, summary, and the animated stats card |
+| `#about` | Short bio, core competencies, quick facts |
+| `#experience` | Interactive timeline — click "View responsibilities" to expand each role |
+| `#case-studies` | GorryWell (tabbed, illustrative/fictional use cases) + SMK Sejahtera and YARSI (real projects, shown in full) |
+| `#skills` | Skills grouped by category |
+| `#background` | Education and organizational leadership |
+| `#contact` | Email (with copy-to-clipboard), location, social links |
 
-**Ingin pakai format `.png` atau `.webp`?** Cukup ubah ekstensi pada atribut
-`src="..."` di `index.html` sesuai nama file Anda (gunakan Ctrl+F untuk
-mencari nama file di atas).
+Look for `<!-- GANTI: ... -->` comments — these mark spots drafted on your
+behalf (e.g. lessons-learned narrative, thesis title, social links) that are
+worth double-checking against your own recollection before publishing.
 
-## Cara Mengganti Dokumen PDF
+### Things you may want to personalize next
 
-Letakkan 3 berkas PDF Anda di folder `assets/pdfs/` dengan nama:
+- Add your real **LinkedIn** and **GitHub** URLs in the `#contact` section
+  (currently `href="#"`).
+- Fill in your **undergraduate thesis title** in the SMK Sejahtera case study
+  footnote.
+- Review the two "Lessons Learned" paragraphs marked with `GANTI` comments —
+  they were drafted to match the structure you provided and should reflect
+  your own recollection.
+- Decide whether to add a phone number. It was intentionally left out of the
+  public contact section to reduce spam exposure — add it next to the email
+  in `#contact` if you'd prefer it visible.
 
-- `document-1.pdf` → ditampilkan sebagai "Curriculum Vitae"
-- `document-2.pdf` → ditampilkan sebagai "Portofolio Cetak"
-- `document-3.pdf` → ditampilkan sebagai "Sertifikat & Penghargaan"
+## Running Locally
 
-Begitu file diunggah dengan nama yang sama, pratinjau halaman pertama PDF akan
-otomatis muncul di kartu masing-masing (lengkap dengan tombol "Buka Tab Baru"
-dan "Unduh"). Judul dan deskripsi tiap dokumen bisa diganti di `index.html`
-pada bagian `<section class="docs-section" id="dokumen">`.
-
-## Mengedit Teks
-
-Buka `index.html` dengan editor teks apa pun, lalu cari komentar
-`<!-- GANTI: ... -->` — komentar ini menandai bagian yang sebaiknya Anda isi
-dengan data Anda sendiri, antara lain:
-
-- Nama (judul halaman, navbar, hero, footer)
-- Deskripsi singkat & paragraf "Tentang Saya"
-- Daftar keahlian pada teks berjalan (marquee)
-- Judul & deskripsi tiap foto / dokumen
-- Alamat email dan tautan media sosial (Instagram, LinkedIn, GitHub)
-
-## Menjalankan Secara Lokal
-
-Cukup buka `index.html` langsung di browser, atau jalankan server statis
-sederhana (disarankan agar fitur pratinjau PDF berjalan optimal):
+Open `index.html` directly in a browser, or serve it with any static server:
 
 ```bash
-# Python
 python -m http.server 5500
-
-# atau Node.js
+# or
 npx serve .
 ```
 
-Lalu buka `http://localhost:5500`.
+## Publishing via GitHub Pages
 
-## Menerbitkan via GitHub Pages
+1. Push this folder to a GitHub repository.
+2. Go to **Settings → Pages**.
+3. Under "Build and deployment", choose **Deploy from a branch**, branch
+   `main`, folder `/ (root)`, then save.
+4. The site goes live at `https://<username>.github.io/<repo-name>/`.
 
-1. Push seluruh folder ini ke repository GitHub Anda.
-2. Buka **Settings → Pages** pada repository.
-3. Pilih branch (misalnya `main`) dan folder root (`/`), lalu simpan.
-4. Situs akan aktif di `https://<username>.github.io/<nama-repo>/`.
+Every push updates the live site automatically — no build process required.
 
-Setiap kali Anda mengganti foto/PDF atau mengedit teks lalu push ke GitHub,
-situs akan otomatis ter-update dalam beberapa menit — tidak perlu proses
-build apa pun.
+## Technical Notes
 
-## Catatan Teknis
-
-- Font **Fraunces** (judul) dan **Inter** (teks) dimuat dari Google Fonts —
-  butuh koneksi internet saat halaman dibuka.
-- Semua animasi menghormati pengaturan sistem **"Reduce Motion"** — akan
-  otomatis non-aktif/statis bagi pengguna yang mengaktifkannya.
-- Tidak ada dependensi eksternal (tanpa framework, tanpa library JS) selain
-  font — seluruh interaksi ditulis di `js/script.js` murni vanilla JS.
+- Fonts: **Bricolage Grotesque** (display) and **Inter** (body) from Google
+  Fonts — requires an internet connection to load.
+- All animation respects the OS-level **"Reduce Motion"** setting.
+- No frameworks or JS libraries — all interaction (tabs, counters, timeline
+  fill, reveal-on-scroll, copy-to-clipboard) is vanilla JavaScript in
+  `js/script.js`.
